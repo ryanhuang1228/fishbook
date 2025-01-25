@@ -10,8 +10,12 @@ class Affine:
         self.x = None
         self.dW = None
         self.db = None
+        self.original_shape = None
     
     def forward(self, x):
+        # 张量形式 N, C, H, W (CNN)
+        self.original_shape = x.shape
+        x = x.reshape(x.shape[0], -1)
         self.x = x
         y = np.dot(x, self.W) + self.b
         return y
@@ -20,6 +24,7 @@ class Affine:
         dx = np.dot(dout, self.W.T)
         self.dW = np.dot(self.x.T, dout)
         self.db = np.sum(dout, axis=0)  # 以axis=0为轴，沿列方向相加
+        dx = dx.reshape(*self.original_shape)   # 还原张量形式
         return dx
 
 class Relu:
